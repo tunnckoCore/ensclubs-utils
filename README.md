@@ -75,6 +75,13 @@ const CLUBS = [
 ];
 ```
 
+**adding other clubs**
+
+- add your club name to `const CLUBS`, camelCased.
+- add `generate<clubName>ClubInfo` function and export it through `exports`
+- it should return and object like `{ 'ensdomain': getInfoForLabel('ensdomain') }` which holds all the supply
+- **that's it!** use `getHolders`, `writeHolders` as shown below
+
 **Methods**
 
 #### generate\*ClubInfo
