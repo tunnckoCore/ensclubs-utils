@@ -1,9 +1,10 @@
 'use strict';
 
-const pMap = require('p-map');
+const pMap = require('p-each-series');
 const utils = require('./index.js');
 
 async function main() {
+	const { provider, contract } = utils.prepareSetup();
 	
 	/*
 	await utils.getHolders(utils.generate0x2digitsClubInfo());
@@ -13,11 +14,14 @@ async function main() {
 	console.log('');
 	
 	//console.log(utils.getInfoForLabel('10970'))
-	await pMap(utils.CLUBS, mapper, {concurrency: 30});
+	await pMap(utils.CLUBS, mapper, {concurrency: 5});
 	
 	async function mapper(clubName) {
 		console.log('Generating', clubName, 'snapshot');
-		const data = await utils.getHolders(utils[`generate${clubName}ClubInfo`](), {log:true, concurrency: 1000});
+		const data = await utils.getHolders(utils[`generate${clubName}ClubInfo`](), {
+			delay: null, log: true, concurrency: 50,
+			provider, contract, clubName,
+		});
 		const res = await utils.writeHolders(data, clubName);
 		
 		console.log('Snapshot', res.filepath, 'created');
@@ -25,4 +29,4 @@ async function main() {
 	}
 }
 
-main().catch(console.error);
+main().then(() => process.exit(0)).catch(console.error);

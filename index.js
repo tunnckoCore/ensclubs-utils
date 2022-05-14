@@ -10,6 +10,7 @@ const CONTRACT_ABI = require('./contract-abi.json');
 const ENS_CONTRACT = '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85';
 const TOKEN_IDS = 'https://raw.githubusercontent.com/implementcollective/10kclub-utils/main/token-ids.json'
 const ETHERSCAN_KEY = 'XXX';
+const ALCHEMY_KEY = 'XXX';
 const EHTERSCAN_URL = 'http://api.etherscan.io/api?module=contract&action=getabi&address=' + ENS_CONTRACT;
 const MY_ID = '90189362340486413291294039646849563756813736977408559890121254376144397471744';
 
@@ -24,7 +25,7 @@ const CLUBS = [
 	'4digits',
 	'0x3digits',
 	'0x4digits',
-	'5digits',
+	//'5digits',
 ];
 exports.CLUBS = CLUBS;
 exports.EHTERSCAN_URL = EHTERSCAN_URL;
@@ -170,34 +171,46 @@ function generate2digitHyphensClubInfo() {
 	return generateClub({ isHyphens: true, pad: 2, end: 100 })
 }
 
+
+
+
+exports.prepareSetup = prepareSetup;
+function prepareSetup(options) {
+	const provider = ethers.getDefaultProvider('homestead', {
+		alchemy: ALCHEMY_KEY,
+		etherscan: ETHERSCAN_KEY,
+		...options
+	});
+	const contract = new ethers.Contract(ENS_CONTRACT, CONTRACT_ABI, provider);
+	
+	return { provider, contract };
+}
+
 exports.getHolders = getHolders;
-
-exports.provider = null;
-exports.contract = null;
-
 async function getHolders(info, options) {		
 	const opts = {log: false, ...options}
 	const timestamp = Date.now();
 	const date = new Date(timestamp);
 
-	exports.provider = exports.provider || new ethers.providers.EtherscanProvider('homestead', ETHERSCAN_KEY);
-	exports.contract = exports.contract || new ethers.Contract(ENS_CONTRACT, CONTRACT_ABI, exports.provider);
+	if (opts.delay) {
+		await require('timers/promises').setTimeout(opts.delay);
+	}
 	
+	const { provider, contract } = opts;
 	const result = { holders: {}, expired: {}, labels: {} };
 	
 	const mapper = async (key, idx) => {
+		
+		await require('timers/promises').setTimeout(1000);
+		
 		const tokenInfo = info[key];
 		
-		if (idx % 5) {
-			await require('timers/promises').setTimeout(1500)
-		}
 		result.labels[key] = tokenInfo;
 		
 		try {
 			//opts.log && console.log(key);
-			const owner = await exports.contract.ownerOf(tokenInfo.id);
-			
-			opts.log && console.log(tokenInfo.name, owner);
+			const owner = await contract.ownerOf(tokenInfo.id);
+			opts.log && console.log(tokenInfo.name, owner, clubName);
 			
 			// by owner
 			result.holders[owner] = result.holders[owner] || { labels: [], ids: [], owner };
