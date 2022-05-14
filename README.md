@@ -17,6 +17,15 @@ node generate-snapshots.js
 node map-labels.js
 ```
 
+**Check `owners-to-labels.json`:** it lists what ens clubs each owner holds, this 2nd one on the picture holds:
+
+- 0x2digits
+- 10k 3digit
+- 10k 4digit
+
+![image](https://user-images.githubusercontent.com/5038030/168429704-9a59f6de-64b9-4337-8a78-a4e2f6f1e8ca.png)
+
+
 ### Descriptions
 
 **Club Names**
